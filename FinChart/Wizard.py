@@ -1,10 +1,11 @@
 import sys
 import typing
+from collections import OrderedDict
 
 from PyQt5.QtWidgets import QApplication, QVBoxLayout
 
-import ParadoxTrading.Chart.View
-import ParadoxTrading.Chart.Window
+from FinChart.Window import Window
+from FinChart.View import View
 
 
 class Wizard:
@@ -12,7 +13,7 @@ class Wizard:
     SCROLL_STEP = 10.0
 
     def __init__(self, _width: int = 1440, _height: int = 720):
-        self.view_dict: typing.Dict[str, ParadoxTrading.Chart.View.View] = {}
+        self.view_dict: typing.Dict[str, View] = OrderedDict()
 
         # map x to axis idx
         self.x2idx: typing.Dict[typing.Any, int] = None
@@ -23,21 +24,29 @@ class Wizard:
         self.end_idx: int = 0
 
         self.app: QApplication = None
-        self.window: ParadoxTrading.Chart.Window = None
+        self.window: Window = None
         self.width = _width
         self.height = _height
 
     def addView(
-            self, _name: str, _view_stretch: int = 1,
-            _adaptive=True, _chart_stretch: int = 15
-    ) -> 'ParadoxTrading.Chart.View.View':
+        self,
+        _name: str,
+        _view_stretch: int = 1,
+        _adaptive=True,
+        _chart_stretch: int = 15,
+    ) -> View:
+        """
+        Add a new view. If there are multi-views, they will be
+        sorted as you add.
+
+        :param _name: the name of this view
+        :param 
+        """
         assert _name not in self.view_dict.keys()
         assert _view_stretch > 0
         assert _chart_stretch > 0
-        self.view_dict[_name] = ParadoxTrading.Chart.View.View(
-            _name, self, _adaptive,
-            _view_stretch, _chart_stretch,
-            len(self.view_dict)
+        self.view_dict[_name] = View(
+            _name, self, _adaptive, _view_stretch, _chart_stretch, len(self.view_dict)
         )
         return self.view_dict[_name]
 
@@ -82,29 +91,32 @@ class Wizard:
         layout = QVBoxLayout()
         # keep the sort when inserted
         for d in sorted(self.view_dict.values(), key=lambda x: x.index):
-            layout.addLayout(
-                d.createChartView(self.x2idx, self.idx2x),
-                d.view_stretch
-            )
+            layout.addLayout(d.createChartView(self.x2idx, self.idx2x), d.view_stretch)
 
-        self.window = ParadoxTrading.Chart.Window.Window(self)
+        self.window = Window(self)
         self.window.resize(self.width, self.height)
         self.window.setLayout(layout)
 
     def show(self):
+        """
+        show the whole chart you draw
+        """
         self.drawWindow()
         self.window.show()
 
         return self.app.exec()
 
     def save(self, _filename: str):
+        """
+        save the whole chart as pic
+
+        :param _filename: path to save the pic
+        """
         self.drawWindow()
         self.window.grab().save(_filename)
 
     def zoomIn(self):
-        diff = max(
-            int((self.end_idx - self.begin_idx) / 2.0 / self.ZOOM_STEP),
-            1)
+        diff = max(int((self.end_idx - self.begin_idx) / 2.0 / self.ZOOM_STEP), 1)
         if self.end_idx - self.begin_idx > 2 * diff:
             self.begin_idx += diff
             self.end_idx -= diff
@@ -113,9 +125,7 @@ class Wizard:
         self._setAxisY(self.begin_idx, self.end_idx)
 
     def zoomOut(self):
-        diff = max(
-            int((self.end_idx - self.begin_idx) / 2.0 / self.ZOOM_STEP),
-            1)
+        diff = max(int((self.end_idx - self.begin_idx) / 2.0 / self.ZOOM_STEP), 1)
         self.begin_idx = max(self.begin_idx - diff, 0)
         self.end_idx = min(self.end_idx + diff, len(self.idx2x) - 1)
 
@@ -123,9 +133,7 @@ class Wizard:
         self._setAxisY(self.begin_idx, self.end_idx)
 
     def scrollLeft(self):
-        diff = max(
-            int((self.end_idx - self.begin_idx) / self.SCROLL_STEP),
-            1)
+        diff = max(int((self.end_idx - self.begin_idx) / self.SCROLL_STEP), 1)
         self.begin_idx -= diff
         self.begin_idx = max(self.begin_idx, 0)
         self.end_idx -= diff
@@ -135,9 +143,7 @@ class Wizard:
         self._setAxisY(self.begin_idx, self.end_idx)
 
     def scrollRight(self):
-        diff = max(
-            int((self.end_idx - self.begin_idx) / self.SCROLL_STEP),
-            1)
+        diff = max(int((self.end_idx - self.begin_idx) / self.SCROLL_STEP), 1)
         self.begin_idx += diff
         self.begin_idx = min(self.begin_idx, len(self.idx2x) - 1)
         self.end_idx += diff

@@ -9,6 +9,16 @@ This module is a chart tool to show time series data based on PyQt5
 3.  scatter
 4.  candle
 
+## Requirements
+
+-   Python >= 3.6
+-   PyQt5 >= 5.10
+-   PyQtChart >= 5.10
+
+## Install
+
+`clone` and `pip install -e .`
+
 ## Quick start
 
 ```python

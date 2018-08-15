@@ -1,24 +1,26 @@
 import typing
+from collections import namedtuple
 
 from PyQt5.Qt import QColor
 from PyQt5.QtChart import QChart, QValueAxis
 from PyQt5.QtWidgets import QGroupBox, QLineEdit, QFormLayout
 
-from ParadoxTrading.Utils import DataStruct
+DataTuple = namedtuple("DataTuple", ["x", "y"])
 
 
 class SeriesAbstract:
-    BAR = 'bar'
-    LINE = 'line'
-    SCATTER = 'scatter'
-    CANDLE = 'candle'
+    BAR = "bar"
+    LINE = "line"
+    SCATTER = "scatter"
+    CANDLE = "candle"
 
     def __init__(
-            self, _name: str,
-            _x_list: typing.Sequence,
-            _y_list: typing.Sequence,
-            _color: typing.Any = None,
-            _show_value: bool = True
+        self,
+        _name: str,
+        _x_list: typing.Sequence,
+        _y_list: typing.Sequence,
+        _color: typing.Any = None,
+        _show_value: bool = True,
     ):
         assert len(_x_list) == len(_y_list)
         assert len(_x_list) > 0
@@ -30,28 +32,27 @@ class SeriesAbstract:
         self.show_group: QGroupBox = None
         self.show_edit: QLineEdit = None
 
-        self.x2y = DataStruct(
-            ['x', 'y'], 'x',
-            list(zip(self.x_list, self.y_list))
-        )
+        self.x2y = [DataTuple(x, y) for x, y in zip(self.x_list, self.y_list)]
         self.color = None if _color is None else QColor(_color)
 
     def calcSetX(self) -> typing.Set:
         return set(self.x_list)
 
-    def calcRangeY(
-            self, _begin_x=None, _end_x=None
-    ) -> typing.Tuple:
-        tmp_y = self.x2y.loc[_begin_x:_end_x]['y']
+    def calcRangeY(self, _begin_x=None, _end_x=None) -> typing.Tuple:
+        tmp_y = self.x2y.loc[_begin_x:_end_x]["y"]
         if len(tmp_y) == 0:
             return None, None
         return min(tmp_y), max(tmp_y)
 
     def addSeries(
-            self, _x2idx: typing.Dict, _idx2x: list, _chart: QChart,
-            _axis_x: QValueAxis, _axis_y: QValueAxis
+        self,
+        _x2idx: typing.Dict,
+        _idx2x: typing.List,
+        _chart: QChart,
+        _axis_x: QValueAxis,
+        _axis_y: QValueAxis,
     ):
-        raise NotImplementedError('implement addSeries plz')
+        raise NotImplementedError("implement addSeries plz")
 
     def createShow(self):
         self.show_group = QGroupBox()
@@ -65,7 +66,7 @@ class SeriesAbstract:
     def updateValue(self, _x):
         value = self.x2y.loc[_x]
         if value is None:
-            self.show_edit.setText('')
+            self.show_edit.setText("")
         else:
-            value = value['y'][0]
-            self.show_edit.setText('{:.5f}'.format(value))
+            value = value["y"][0]
+            self.show_edit.setText("{:.5f}".format(value))

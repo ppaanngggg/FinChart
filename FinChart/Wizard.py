@@ -4,8 +4,8 @@ from collections import OrderedDict
 
 from PyQt5.QtWidgets import QApplication, QVBoxLayout
 
-from FinChart.Window import Window
 from FinChart.View import View
+from FinChart.Window import Window
 
 
 class Wizard:
@@ -40,17 +40,19 @@ class Wizard:
         sorted as you add.
 
         :param _name: the name of this view
-        :param 
+        :param _view_stretch: the stretch compared with other views
+        :param _adaptive: adapt y or not
+        :param _chart_stretch: the stretch of chart compared with text in this view
         """
-        assert _name not in self.view_dict.keys()
+        assert _name not in self.view_dict
         assert _view_stretch > 0
         assert _chart_stretch > 0
         self.view_dict[_name] = View(
-            _name, self, _adaptive, _view_stretch, _chart_stretch, len(self.view_dict)
+            _name, self, _adaptive, _view_stretch, _chart_stretch
         )
         return self.view_dict[_name]
 
-    def _calcSetX(self) -> (dict, list):
+    def _calcSetX(self) -> typing.Tuple[dict, list]:
         """
         :return: x2idx and idx2x, because idx is int, then idx2x is list
         """

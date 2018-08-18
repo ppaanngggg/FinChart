@@ -1,4 +1,4 @@
-# ParadoxTrading.Chart
+# FinChart
 
 This module is a chart tool to show time series data based on PyQt5
 

@@ -1,23 +1,30 @@
 import typing
 
 from PyQt5.QtChart import QValueAxis, QChart, QScatterSeries
-from ParadoxTrading.Chart.SeriesAbstract import SeriesAbstract
+
+from FinChart.SeriesAbstract import SeriesAbstract
+
 
 class ScatterSeries(SeriesAbstract):
     def __init__(
-            self, _name: str,
-            _x_list: typing.Sequence,
-            _y_list: typing.Sequence,
-            _color: typing.Any = None,
-            _show_value: bool = True,
+        self,
+        _name: str,
+        _x_list: typing.Sequence,
+        _y_list: typing.Sequence,
+        _color: typing.Any = None,
+        _show_value: bool = True,
     ):
         super().__init__(_name, _x_list, _y_list, _color, _show_value)
 
         self.type = SeriesAbstract.SCATTER
 
     def addSeries(
-            self, _x2idx: typing.Dict, _idx2x: list, _chart: QChart,
-            _axis_x: QValueAxis, _axis_y: QValueAxis
+        self,
+        _x2idx: typing.Dict,
+        _idx2x: list,
+        _chart: QChart,
+        _axis_x: QValueAxis,
+        _axis_y: QValueAxis,
     ):
         series = QScatterSeries()
         series.setName(self.name)

@@ -92,7 +92,7 @@ class Wizard:
 
         layout = QVBoxLayout()
         # keep the sort when inserted
-        for d in sorted(self.view_dict.values(), key=lambda x: x.index):
+        for d in self.view_dict.values():
             layout.addLayout(d.createChartView(self.x2idx, self.idx2x), d.view_stretch)
 
         self.window = Window(self)

@@ -1,4 +1,5 @@
 import typing
+from bisect import bisect_right, bisect_left
 from collections import namedtuple
 
 from PyQt5.Qt import QColor
@@ -32,14 +33,36 @@ class SeriesAbstract:
         self.show_group: QGroupBox = None
         self.show_edit: QLineEdit = None
 
-        self.x2y = [DataTuple(x, y) for x, y in zip(self.x_list, self.y_list)]
         self.color = None if _color is None else QColor(_color)
+
+    def _find_begin_idx(self, _x):
+        if _x is None:
+            return _x
+
+        i = bisect_left(self.x_list, _x)
+        if i != len(self.x_list):
+            return i
+        else:
+            return i - 1
+
+    def _find_end_idx(self, _x):
+        if _x is None:
+            return _x
+
+        return bisect_right(self.x_list, _x)
+
+    def _find_idx(self, _x):
+        i = bisect_left(self.x_list, _x)
+        if i != len(self.x_list) and self.x_list[i] == _x:
+            return i
+        else:
+            return None
 
     def calcSetX(self) -> typing.Set:
         return set(self.x_list)
 
     def calcRangeY(self, _begin_x=None, _end_x=None) -> typing.Tuple:
-        tmp_y = self.x2y.loc[_begin_x:_end_x]["y"]
+        tmp_y = self.y_list[self._find_begin_idx(_begin_x) : self._find_end_idx(_end_x)]
         if len(tmp_y) == 0:
             return None, None
         return min(tmp_y), max(tmp_y)
@@ -64,9 +87,8 @@ class SeriesAbstract:
         self.show_group.setLayout(layout)
 
     def updateValue(self, _x):
-        value = self.x2y.loc[_x]
-        if value is None:
+        idx = self._find_idx(_x)
+        if idx is None:
             self.show_edit.setText("")
         else:
-            value = value["y"][0]
-            self.show_edit.setText("{:.5f}".format(value))
+            self.show_edit.setText("{:.5f}".format(self.y_list[idx]))

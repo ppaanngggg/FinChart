@@ -14,6 +14,7 @@ class SeriesAbstract:
     LINE = "line"
     SCATTER = "scatter"
     CANDLE = "candle"
+    BOX = "box"
 
     def __init__(
         self,

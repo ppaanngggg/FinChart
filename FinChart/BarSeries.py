@@ -29,9 +29,9 @@ class BarSeries(SeriesAbstract):
         bar_set = QBarSet(self.name)
         tmp_dict = dict(zip(self.x_list, self.y_list))
         for k in _idx2x:
-            if k in tmp_dict.keys():
+            try:
                 bar_set.append(tmp_dict[k])
-            else:
+            except KeyError:
                 bar_set.append(0)
 
         if self.color is not None:

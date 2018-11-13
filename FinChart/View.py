@@ -5,6 +5,7 @@ from PyQt5.QtChart import QChart, QChartView, QValueAxis
 from PyQt5.QtWidgets import QHBoxLayout, QFormLayout
 
 from FinChart.BarSeries import BarSeries
+from FinChart.BoxSeries import BoxSeries
 from FinChart.CandleSeries import CandleSeries
 from FinChart.LineSeries import LineSeries
 from FinChart.ScatterSeries import ScatterSeries
@@ -112,6 +113,19 @@ class View:
         assert _name not in self.series_table
         self.series_table[_name] = CandleSeries(
             _name, _x_list, _y_list, _inc_color, _dec_color, _show_value
+        )
+
+    def addBox(
+        self,
+        _name: str,
+        _x_list: typing.Sequence,
+        _y_list: typing.Sequence[typing.Sequence],
+        _color: typing.Any = None,
+        _show_value: bool = False,
+    ):
+        assert _name not in self.series_table
+        self.series_table[_name] = BoxSeries(
+            _name, _x_list, _y_list, _color, _show_value
         )
 
     def calcSetX(self) -> typing.Set:
